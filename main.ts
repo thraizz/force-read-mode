@@ -35,23 +35,31 @@ export default class ForceReadModePlugin extends Plugin {
         // Iterate over each leaf
         leaves.forEach((leaf) => {
             // Ensure the leaf has a MarkdownView
-            if (leaf.view instanceof MarkdownView) {
-                // Get the file currently opened in the leaf
-                const file = leaf.view.file;
-
-                // Ensure the file exists and is a markdown file
-                if (file && file.extension === "md") {
-                    // Check if the file is within any of the target folders or their subfolders
-                    if (this.settings.targetFolderPaths.some(path => file.path.startsWith(path))) {
-                        // Force the view into preview (read mode)
-                        leaf.setViewState({
-                            ...leaf.getViewState(),
-                            state: { mode: "preview" } // Force preview (read mode)
-                        });
-                    }
-                }
+            if (!(leaf.view instanceof MarkdownView)) {
+                return;
             }
-        });
+        
+            // Get the file currently opened in the leaf
+            const file = leaf.view.file;
+        
+            // If no file is present, skip
+            if (!file) {
+                return;
+            }
+        
+            // Check if the file is within any of the target folders or their subfolders
+            const isInTargetFolder = this.settings.targetFolderPaths.some(path => file.path.startsWith(path));
+            
+            if (!isInTargetFolder) {
+                return;
+            }
+        
+            // Force the view into preview (read mode)
+            leaf.setViewState({
+                ...leaf.getViewState(),
+                state: { mode: 'preview' } // Force preview (read mode)
+            });
+        });        
     }
 
     // Load settings
