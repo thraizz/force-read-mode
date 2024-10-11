@@ -77,10 +77,10 @@ class ForceReadModeSettingTab extends PluginSettingTab {
         const { containerEl } = this;
 
         containerEl.empty();
-        containerEl.createEl('h2', { text: 'Force Read Mode Settings' });
 
         // Add a setting for folder paths
         new Setting(containerEl)
+            .setName('Force Read Mode').setHeading()
             .setName('Target Folder Paths')
             .setDesc('Specify the folder paths where markdown files should always open in read mode.')
             .addTextArea(text => text
