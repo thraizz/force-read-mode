@@ -7,6 +7,9 @@
 - Automatically switches markdown files to read mode (preview) when opened from specified folders.
 - Supports multiple folder paths.
 - Simple settings interface to configure folder paths.
+- Quickly disable the plugin using the Command Palette:
+   - Use "Force Read Mode: Disable" to deactivate.
+   - Use "Force Read Mode: Enable" to activate.
 
 ## How to Use
 
@@ -14,6 +17,7 @@
 2. Enable the plugin from **Settings → Community Plugins**.
 3. Open **Settings → Force Read Mode** to configure:
    - Add folder paths where you want markdown files to open in read mode (one path per line).
+4. Use the Command Palette (Ctrl+P or Cmd+P) to toggle the plugin on or off with "Force Read Mode: Enable" or "Force Read Mode: Disable".
 
 ## Development
 

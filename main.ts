@@ -1,4 +1,4 @@
-import { Plugin, MarkdownView, PluginSettingTab, Setting } from 'obsidian';
+import { Plugin, MarkdownView, Notice, PluginSettingTab, Setting } from 'obsidian';
 
 
 interface ForceReadModePluginSettings {
@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS: ForceReadModePluginSettings = {
 
 export default class ForceReadModePlugin extends Plugin {
     settings: ForceReadModePluginSettings;
+    isEnabled: boolean = true;
 
     // Plugin initialization
     async onload() {
@@ -25,12 +26,33 @@ export default class ForceReadModePlugin extends Plugin {
         this.registerEvent(
             this.app.workspace.on('layout-change', this.onLayoutChange.bind(this))
         );
+
+        // Add command to toggle the plugin
+        this.toggleCommand();
+    }
+
+    // set command according to boolean isEnabled
+    toggleCommand(){
+        this.addCommand({
+            id: 'toggle-force-read-mode',
+            name: this.isEnabled ? 'Disable' : 'Enable',
+            callback: () => {
+                this.isEnabled = !this.isEnabled;    
+                new Notice(`Force Read Mode ${this.isEnabled ? 'Enabled' : 'Disabled'}`);
+                this.toggleCommand();
+            }
+        });
     }
 
     // Handle layout changes
     private async onLayoutChange() {
         // Get all open leaves in the workspace
         const leaves = this.app.workspace.getLeavesOfType('markdown');
+
+        // Check if plugin is temporarly disabled
+        if (!this.isEnabled) {
+            return;
+        }
 
         // Iterate over each leaf
         leaves.forEach((leaf) => {
