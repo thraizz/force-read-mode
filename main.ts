@@ -4,11 +4,13 @@ import { MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from 'obsidia
 interface ForceReadModePluginSettings {
     targetFolderPaths: string[];  // Array of folder paths
     targetFilePaths: string[];    // Array of exact file paths
+    restoreSourceMode: boolean;   // Whether to restore source mode for non-filtered files
 }
 
 const DEFAULT_SETTINGS: ForceReadModePluginSettings = {
     targetFolderPaths: [],	// Array of folder paths is empty by default
-    targetFilePaths: []     // Array of exact file paths is empty by default
+    targetFilePaths: [],     // Array of exact file paths is empty by default
+    restoreSourceMode: false  // Do not restore source mode by default for compatibility with previous versions
 };
 
 
@@ -84,6 +86,14 @@ export default class ForceReadModePlugin extends Plugin {
                     ...leaf.getViewState(),
                     state: { mode: 'preview' } // Force preview (read mode)
                 });
+            } else {
+                // Restore to source mode (edit mode) if the setting is enabled
+                if (this.settings.restoreSourceMode) {
+                    leaf.setViewState({
+                        ...leaf.getViewState(),
+                        state: { mode: 'source' } // Return to edit mode
+                    });
+                }
             }
         });        
     }
@@ -135,6 +145,17 @@ class ForceReadModeSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     // Update the settings with the new exact file paths
                     this.plugin.settings.targetFilePaths = value.split('\n').map(path => path.trim()).filter(path => path.length > 0);
+                    await this.plugin.saveSettings();
+                }));
+                
+        // Add toggle for restoring source mode
+        new Setting(containerEl)
+            .setName('Restore Source Mode')
+            .setDesc('When enabled, opening files not in your target folders/paths will automatically switch to edit mode again.')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.restoreSourceMode)
+                .onChange(async (value) => {
+                    this.plugin.settings.restoreSourceMode = value;
                     await this.plugin.saveSettings();
                 }));
     }
